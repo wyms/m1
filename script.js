@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let sortDirection = "desc";
 
     // Initialize the map when the page loads
-    // whole world map = L.map('map').setView([0, 0], 2); // Initial center and zoom level
-    // Initialize the map when the page loads
     map = L.map('map').setView([39.8282, -98.5795], 3); // Initial center and zoom level, North America
 
     // Add a base tile layer from OpenStreetMap
@@ -22,6 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    // Function to save entries to local storage
+    function saveEntriesToLocalStorage() {
+        localStorage.setItem(localStorageKey, JSON.stringify(entries));
+    }
+
+    // Function to load entries from local storage
     function loadEntries() {
         const entriesJSON = localStorage.getItem(localStorageKey);
         if (entriesJSON) {
@@ -32,12 +36,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Function to add a new row to the table
     function addRowToTable(entry) {
         entries.push(entry);
-        localStorage.setItem(localStorageKey, JSON.stringify(entries));
+        saveEntriesToLocalStorage(); // Save the updated entries
         renderTable();
     }
 
+    // Function to render the table
     function renderTable(entriesToRender = entries) {
         tableBody.innerHTML = "";
 
@@ -70,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
         updateMapMarkers(entriesToRender);
     }
 
+    // Function to update map markers
     function updateMapMarkers(entriesToRender) {
         // Clear all markers from the map
         map.eachLayer(function (layer) {
@@ -88,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Function to add static records
     function addStaticRecords() {
         const staticRecords = [
             {
@@ -108,72 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 latitude: "39.161113",
                 longitude: "-106.753560",
             },
-            
-
-            {
-                link: "https://www.youtube.com/watch?v=PiiBVZYQXfU",
-                description: "2023 NCAA Championships FAU vs LSU",
-                dateTime: "2023-05-05 2:00 PM",
-                city: "Gulf Shores",
-                state: "AL",
-                latitude: "30.2444009",
-                longitude: "-87.7563601",
-            },
-            {
-                link:
-                    "https://www.youtube.com/watch?v=113Pc5FMzog&pp=ygUbZXhoaWJpdGlvbiB0aHJlZXMgbnl2YXJzaXR5",
-                description: "2023 AVP MBO TaCrabb/Sander vs Budinger/Evans (8/19)",
-                dateTime: "2023-08-19 10:00 AM",
-                city: "Manhattan Beach",
-                state: "CA",
-                latitude: "33.891599",
-                longitude: "-118.395124",
-            },
-            {
-                link: "https://www.youtube.com/watch?v=mUoJU1JWn1w",
-                description: "2023 Motherlode: Couts/G.Basey vs Del Sol/Hoover",
-                dateTime: "2023-09-4 3:00 PM",
-                city: "Aspen",
-                state: "CO",
-                latitude: "39.191113",
-                longitude: "-106.823560",
-            },
-            {
-                link: "https://www.youtube.com/watch?v=jBqZ3RqQCDc",
-                description: "2023 Motherlode 45s Griffith/Young vs Sadler/Sass",
-                dateTime: "2023-08-31 2:00 PM",
-                city: "Aspen",
-                state: "CO",
-                latitude: "39.1888327",
-                longitude: "-106.8268543",
-            },
-            {
-                link: "https://www.youtube.com/live/E2OgcoMcBpg?si=TQj1KFHXZIDcDrKI",
-                description: "2023 Motherlode Finals 50s Griffith/Young vs Lentin/Meador",
-                dateTime: "2023-08-30 4:00 PM",
-                city: "Aspen",
-                state: "CO",
-                latitude: "39.1888327",
-                longitude: "-106.8268543",
-            },
-            {
-                link: "https://www.youtube.com/watch?v=hc_N3PCBEs4&t=676s",
-                description: "TAMU-CC vs TCU 1s",
-                dateTime: "2019-03-23 3:15 PM",
-                city: "Ft. Worth",
-                state: "TX",
-                latitude: "32.708327",
-                longitude: "-97.3662645",
-            },
-            {
-                link: "https://www.youtube.com/watch?v=YDyWzEuZdAg",
-                description: "2023 CUSA Championship FAU vs FIU",
-                dateTime: "2023-04-29 3:00 PM",
-                city: "Ft. Lauderdale",
-                state: "FL",
-                latitude: "26.1092371",
-                longitude: "-80.1097871",
-            },
+            // Add more static records as needed
         ];
 
         staticRecords.forEach(function (record) {
