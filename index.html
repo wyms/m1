@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+            <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-65KWWCDLJD"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-65KWWCDLJD');
+        </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" /> <!-- Leaflet CSS -->
+    <script src="https://nominatim.openstreetmap.org/js/nominatim.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Live Stream Finder</title>
+</head>
+<body>
+    <header>
+        <h1>Live Stream Finder</h1>
+    </header>
+     <!-- Map Container -->
+    <div id="map-container">
+        <div id="map" style="height: 400px;"></div>
+    </div>
+  
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script> <!-- Leaflet JavaScript -->
+    <script src="script.js"></script>
+    <main>
+        <section class="table-container">
+            <h2>Search Live Streams</h2>
+            <input type="text" id="search" placeholder="Search...">
+            <table id="stream-table">
+                <thead>
+                    <tr>
+                        <th data-column="description">Live Stream</th>
+                        <th data-column="dateTime">Date and Time</th>
+                        <th data-column="city">City</th>
+                        <th data-column="state">State</th>
+                        <th data-column="latitude">Latitude</th>
+                        <th data-column="longitude">Longitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table rows will be dynamically added here -->
+                </tbody>
+            </table>
+            <button id="save-button">Save Changes</button>
+        </section>  <section class="form-container">
+        <form id="stream-form">
+            <label for="link">Live Stream Link:</label>
+            <input type="text" id="link" required>
+            <label for="description">Description:</label>
+            <input type="text" id="description" required>
+            <label for="city">City:</label>
+            <input type="text" id="city" required>
+            <label for="state">State:</label>
+            <input type="text" id="state" required>
+            <label for="use-my-location">Use My Location:</label>
+            <input type="checkbox" id="use-my-location">
+            <button type="submit">Add Stream</button>
+        </form>
+    </section>
+    </main>
+   
+</body>
+</html>
