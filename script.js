@@ -1,27 +1,5 @@
 let map; // Declare a variable to hold the map instance
 
-async function getLatLong(city, state) {
-    const query = `${city}, ${state}`;
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (Array.isArray(data) && data.length > 0) {
-            return {
-                latitude: data[0].lat,
-                longitude: data[0].lon,
-            };
-        } else {
-            throw new Error("Location not found");
-        }
-    } catch (error) {
-        throw error;
-    }
-}
-
-
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("stream-form");
     const tableBody = document.querySelector("#stream-table tbody");
@@ -112,15 +90,32 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-  // Function to add static records
+    // Function to perform reverse geocoding based on latitude and longitude
+    function reverseGeocode(latitude, longitude) {
+        // Implement reverse geocoding logic here
+        // You can use a suitable service or API to obtain city and state information
+        // Example API request: https://api.example.com/reverse-geocode?lat={latitude}&lon={longitude}
+        // Return an object with city and state properties
+        // For this example, we'll mock the result with a Promise
+        return new Promise((resolve, reject) => {
+            // Simulate a delay for the mock reverse geocoding request
+            setTimeout(() => {
+                const locationInfo = {
+                    city: "Sample City",
+                    state: "Sample State",
+                };
+                resolve(locationInfo);
+            }, 1000); // Adjust the delay as needed
+        });
+    }
+
+    // Function to add static records
     function addStaticRecords() {
         const staticRecords = [
             {
                 link: "https://www.youtube.com/watch?v=Zz5IPOjSZMY&t=1322s",
                 description: "2023 BlackRabbit AVP Open Malone/Young vs Klentzman/Liu",
                 dateTime: "2023-03-25 8:00 AM",
-                city: "Lewisville",
-                state: "TX",
                 latitude: "33.015576",
                 longitude: "-96.997158",
             },
@@ -128,8 +123,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 link: "https://www.youtube.com/watch?v=32UHRVx5GhA",
                 description: "Amazing ICN (It's Called Normal) 3-on-3 Exhibition with Randy Stoklos and NYVarsity",
                 dateTime: "2023-09-4 12:00 PM",
-                city: "Aspen",
-                state: "CO",
                 latitude: "39.161113",
                 longitude: "-106.753560",
             },
@@ -140,15 +133,24 @@ document.addEventListener("DOMContentLoaded", function () {
             const exists = entries.some((entry) => entry.description === record.description);
 
             if (!exists) {
-                addRowToTable(record);
+                // Use reverse geocoding to get city and state based on latitude and longitude
+                reverseGeocode(record.latitude, record.longitude)
+                    .then((locationInfo) => {
+                        record.city = locationInfo.city;
+                        record.state = locationInfo.state;
+                        addRowToTable(record);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        alert("Error fetching location information. Please try again.");
+                    });
             }
         });
     }
 
     // Rest of your code for sorting, filtering, and form submission
 
-
-// Event listener for sorting column headers
+    // Event listener for sorting column headers
     document.querySelectorAll("th").forEach((header) => {
         header.addEventListener("click", function () {
             const column = header.getAttribute("data-column");
@@ -189,30 +191,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const link = document.getElementById("link").value;
         const description = document.getElementById("description").value;
-        const city = document.getElementById("city").value;
-        const state = document.getElementById("state").value;
 
         if (!useMyLocationCheckbox.checked) {
+            const city = document.getElementById("city").value;
+            const state = document.getElementById("state").value;
+
             getLatLong(city, state)
                 .then((result) => {
                     const newEntry = {
                         link,
                         description,
                         dateTime: new Date().toLocaleString(),
-                        city,
-                        state,
                         latitude: result.latitude,
                         longitude: result.longitude,
                     };
 
-                    addRowToTable(newEntry);
+                    // Use reverse geocoding to get city and state based on latitude and longitude
+                    reverseGeocode(result.latitude, result.longitude)
+                        .then((locationInfo) => {
+                            newEntry.city = locationInfo.city;
+                            newEntry.state = locationInfo.state;
 
-                    document.getElementById("link").value = "";
-                    document.getElementById("description").value = "";
-                    document.getElementById("city").value = "";
-                    document.getElementById("state").value = "";
+                            addRowToTable(newEntry);
 
-                    filterTable();
+                            document.getElementById("link").value = "";
+                            document.getElementById("description").value = "";
+                            document.getElementById("city").value = "";
+                            document.getElementById("state").value = "";
+
+                            filterTable();
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            alert("Error fetching location information. Please try again.");
+                        });
                 })
                 .catch((error) => {
                     console.error(error);
@@ -226,20 +238,29 @@ document.addEventListener("DOMContentLoaded", function () {
                             link,
                             description,
                             dateTime: new Date().toLocaleString(),
-                            city: "",
-                            state: "",
                             latitude: position.coords.latitude.toFixed(6),
                             longitude: position.coords.longitude.toFixed(6),
                         };
 
-                        addRowToTable(newEntry);
+                        // Use reverse geocoding to get city and state based on latitude and longitude
+                        reverseGeocode(newEntry.latitude, newEntry.longitude)
+                            .then((locationInfo) => {
+                                newEntry.city = locationInfo.city;
+                                newEntry.state = locationInfo.state;
 
-                        document.getElementById("link").value = "";
-                        document.getElementById("description").value = "";
-                        document.getElementById("city").value = "";
-                        document.getElementById("state").value = "";
+                                addRowToTable(newEntry);
 
-                        filterTable();
+                                document.getElementById("link").value = "";
+                                document.getElementById("description").value = "";
+                                document.getElementById("city").value = "";
+                                document.getElementById("state").value = "";
+
+                                filterTable();
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                                alert("Error fetching location information. Please try again.");
+                            });
                     },
                     (error) => {
                         console.error(error);
@@ -251,35 +272,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
-
-
-
-
-    // Event listener for sorting column headers
-    document.querySelectorAll("th").forEach((header) => {
-        header.addEventListener("click", function () {
-            const column = header.getAttribute("data-column");
-
-            // Toggle the sort direction if the same column is clicked
-            if (sortColumn === column) {
-                sortDirection = sortDirection === "asc" ? "desc" : "asc";
-            } else {
-                // Default to descending for a new column
-                sortDirection = "desc";
-                sortColumn = column;
-            }
-
-            // Render the sorted table
-            renderTable();
-        });
-    });
-
-    // Event listener for the search input
-    searchInput.addEventListener("input", function () {
-        filterTable();
-    });
-
-    // Rest of your code for handling form submission and adding static records
 
     // Call the function to add static records
     addStaticRecords();
