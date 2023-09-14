@@ -1,5 +1,27 @@
 let map; // Declare a variable to hold the map instance
 
+async function getLatLong(city, state) {
+    const query = `${city}, ${state}`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+            return {
+                latitude: data[0].lat,
+                longitude: data[0].lon,
+            };
+        } else {
+            throw new Error("Location not found");
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("stream-form");
     const tableBody = document.querySelector("#stream-table tbody");
@@ -20,11 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Function to save entries to local storage
-    function saveEntriesToLocalStorage() {
-        localStorage.setItem(localStorageKey, JSON.stringify(entries));
-    }
-
     // Function to load entries from local storage
     function loadEntries() {
         const entriesJSON = localStorage.getItem(localStorageKey);
@@ -39,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to add a new row to the table
     function addRowToTable(entry) {
         entries.push(entry);
-        saveEntriesToLocalStorage(); // Save the updated entries
+        localStorage.setItem(localStorageKey, JSON.stringify(entries));
         renderTable();
     }
 
@@ -95,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Function to add static records
+  // Function to add static records
     function addStaticRecords() {
         const staticRecords = [
             {
@@ -128,7 +145,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Event listener for sorting column headers
+    // Rest of your code for sorting, filtering, and form submission
+
+
+// Event listener for sorting column headers
     document.querySelectorAll("th").forEach((header) => {
         header.addEventListener("click", function () {
             const column = header.getAttribute("data-column");
@@ -231,6 +251,35 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+
+
+
+
+    // Event listener for sorting column headers
+    document.querySelectorAll("th").forEach((header) => {
+        header.addEventListener("click", function () {
+            const column = header.getAttribute("data-column");
+
+            // Toggle the sort direction if the same column is clicked
+            if (sortColumn === column) {
+                sortDirection = sortDirection === "asc" ? "desc" : "asc";
+            } else {
+                // Default to descending for a new column
+                sortDirection = "desc";
+                sortColumn = column;
+            }
+
+            // Render the sorted table
+            renderTable();
+        });
+    });
+
+    // Event listener for the search input
+    searchInput.addEventListener("input", function () {
+        filterTable();
+    });
+
+    // Rest of your code for handling form submission and adding static records
 
     // Call the function to add static records
     addStaticRecords();
